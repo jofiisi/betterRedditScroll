@@ -17,13 +17,15 @@ function findCurrentCenteredPost(posts)
 
     let postsCentered = [];
     posts.forEach((element, index) => {
-        postsCentered[index] = {post: element, yCenter: coordsPostsCentered[index]};
+        postsCentered[index] = {post: element, yCenter: coordsPostsCentered[index] + window.scrollY};
     });
     postsInView = postsCentered.filter((element) => {
         return (element.yCenter > window.scrollY) && (element.yCenter < (window.innerHeight + window.scrollY));
     });
-    console.log((postsCentered[0].yCenter > window.scrollY) && (postsCentered[0].yCenter < (window.innerHeight + window.scrollY)))
-    console.log(postsInView);
+
+    postsInView.forEach(element => {
+        console.log(element.post.ariaLabel);
+    });
 }
 
 document.onreadystatechange = () => {
