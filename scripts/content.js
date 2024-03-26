@@ -13,7 +13,17 @@ function calcMiddleYofPost(post)
 
 function findCurrentCenteredPost(posts)
 {
-    
+    coordsPostsCentered = posts.map(calcMiddleYofPost);
+
+    let postsCentered = [];
+    posts.forEach((element, index) => {
+        postsCentered[index] = {post: element, yCenter: coordsPostsCentered[index]};
+    });
+    postsInView = postsCentered.filter((element) => {
+        return (element.yCenter > window.scrollY) && (element.yCenter < (window.innerHeight + window.scrollY));
+    });
+    console.log((postsCentered[0].yCenter > window.scrollY) && (postsCentered[0].yCenter < (window.innerHeight + window.scrollY)))
+    console.log(postsInView);
 }
 
 document.onreadystatechange = () => {
@@ -39,7 +49,7 @@ document.onreadystatechange = () => {
         document.addEventListener('keydown', function(event) {
             if(event.key == " ") {
                 event.preventDefault();
-                console.log(calcMiddleYofPost(posts[0]));
+                findCurrentCenteredPost(posts);
             }
         });
     }   
