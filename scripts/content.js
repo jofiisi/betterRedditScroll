@@ -1,5 +1,21 @@
 let posts;
 
+function calcMiddleYofPost(post)
+{
+    try {
+        pos = post.getBoundingClientRect();
+        center = (pos.bottom - pos.top) / 2 + pos.top;
+        return center;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+function findCurrentCenteredPost(posts)
+{
+    
+}
+
 document.onreadystatechange = () => {
     if (document.readyState === "complete") {
         alert("loaded");
@@ -9,8 +25,6 @@ document.onreadystatechange = () => {
                     posts = document.getElementsByClassName("w-full m-0");
                     posts = Array.from(posts);
                     posts = posts.filter((element) => element.tagName.toLowerCase() == "article");
-                    console.log("Posts:")
-                    console.log(posts)
                 }
             });
         });
@@ -25,7 +39,7 @@ document.onreadystatechange = () => {
         document.addEventListener('keydown', function(event) {
             if(event.key == " ") {
                 event.preventDefault();
-                console.log(posts[1].getBoundingClientRect());
+                console.log(calcMiddleYofPost(posts[0]));
             }
         });
     }   
