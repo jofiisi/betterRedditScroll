@@ -1,4 +1,5 @@
 let posts;
+let currentContender = 0;
 
 function calcMiddleYofPost(post)
 {
@@ -23,9 +24,42 @@ function findCurrentCenteredPost(posts)
         return (element.yCenter > window.scrollY) && (element.yCenter < (window.innerHeight + window.scrollY));
     });
 
-    postsInView.forEach(element => {
-        console.log(element.post.ariaLabel);
-    });
+    let currentContenderDiff = 0;
+    let currentCandidateDiff = 0;
+    currentContender = 0;
+
+    currentContenderDiff = Math.abs(window.innerHeight / 2 + scrollY - postsInView[0].yCenter);
+
+    for (let i = 0; i < postsInView.length; i++)
+    {
+        currentCandidateDiff = Math.abs(window.innerHeight / 2 + scrollY - postsInView[i].yCenter);
+        if(currentCandidateDiff < currentContenderDiff)
+        {
+            currentContenderDiff = currentCandidateDiff;
+            currentContender = i;
+        }
+    }
+    return postsInView;
+}
+
+function scrollToNextPostInView(postsInView)
+{
+
+    if(postsInView.length != 1)
+    {
+        window.scroll(0, postsInView[currentContender].yCenter);
+
+    }else{
+        for (let i = 0; i < posts.length; i++)
+        {
+            if(posts[i].ariaLabel == postsInView[currentContender].post.ariaLabel)
+            {
+                console.log("1 in view");
+                window.scroll(0, calcMiddleYofPost(posts[i + 1]));
+                break;
+            }
+        }
+    }
 }
 
 document.onreadystatechange = () => {
@@ -51,7 +85,8 @@ document.onreadystatechange = () => {
         document.addEventListener('keydown', function(event) {
             if(event.key == " ") {
                 event.preventDefault();
-                findCurrentCenteredPost(posts);
+                let postsInView = findCurrentCenteredPost(posts);
+                scrollToNextPostInView(postsInView);
             }
         });
     }   
