@@ -44,18 +44,20 @@ function findCurrentCenteredPost(posts)
 
 function scrollToNextPostInView(postsInView)
 {
-
-    if(postsInView.length != 1)
+    console.log(postsInView)
+    if(postsInView.length != (currentContender + 1))
     {
-        window.scroll(0, postsInView[currentContender].yCenter);
+        window.scroll(0, postsInView[currentContender + 1].yCenter - window.innerHeight / 2);
+        console.log("scrolling to " + postsInView[currentContender + 1].post.ariaLabel)
+        console.log(postsInView)
 
     }else{
         for (let i = 0; i < posts.length; i++)
         {
             if(posts[i].ariaLabel == postsInView[currentContender].post.ariaLabel)
             {
-                console.log("1 in view");
-                window.scroll(0, calcMiddleYofPost(posts[i + 1]));
+                window.scroll(0, window.scrollY + calcMiddleYofPost(posts[i + 1]) - window.innerHeight / 2);
+                console.log("1scrolling to " + posts[i+1].ariaLabel)
                 break;
             }
         }
