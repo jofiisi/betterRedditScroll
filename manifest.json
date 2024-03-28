@@ -13,7 +13,8 @@
       {
         "js": ["scripts/content.js"],
         "matches": [
-          "https://*.reddit.com/*"
+          "https://*.reddit.com/",
+          "https://*.reddit.com/r/*/"
         ]
       }
     ]

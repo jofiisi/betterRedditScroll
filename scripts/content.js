@@ -24,6 +24,11 @@ function findCurrentCenteredPost(posts)
         return (element.yCenter > window.scrollY) && (element.yCenter < (window.innerHeight + window.scrollY));
     });
 
+    if(postsInView.length == 0)
+    {
+        return 2;
+    }
+
     let currentContenderDiff = 0;
     let currentCandidateDiff = 0;
     currentContender = 0;
@@ -44,12 +49,9 @@ function findCurrentCenteredPost(posts)
 
 function scrollToNextPostInView(postsInView)
 {
-    console.log(postsInView)
     if(postsInView.length != (currentContender + 1))
     {
         window.scroll(0, postsInView[currentContender + 1].yCenter - window.innerHeight / 2);
-        console.log("scrolling to " + postsInView[currentContender + 1].post.ariaLabel)
-        console.log(postsInView)
 
     }else{
         for (let i = 0; i < posts.length; i++)
@@ -57,7 +59,6 @@ function scrollToNextPostInView(postsInView)
             if(posts[i].ariaLabel == postsInView[currentContender].post.ariaLabel)
             {
                 window.scroll(0, window.scrollY + calcMiddleYofPost(posts[i + 1]) - window.innerHeight / 2);
-                console.log("1scrolling to " + posts[i+1].ariaLabel)
                 break;
             }
         }
@@ -66,7 +67,6 @@ function scrollToNextPostInView(postsInView)
 
 document.onreadystatechange = () => {
     if (document.readyState === "complete") {
-        alert("loaded");
         let observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'childList') {
@@ -86,10 +86,13 @@ document.onreadystatechange = () => {
 
         document.addEventListener('keydown', function(event) {
             if(event.key == " ") {
-                event.preventDefault();
                 let postsInView = findCurrentCenteredPost(posts);
-                scrollToNextPostInView(postsInView);
-            }
+                if(postsInView != 2)
+                {
+                    event.preventDefault();
+                    scrollToNextPostInView(postsInView);
+                }    
+           }
         });
     }   
 }
