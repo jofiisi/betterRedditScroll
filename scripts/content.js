@@ -1,8 +1,8 @@
 let posts;
 let currentContender = 0;
+let enableSmoothScrolling = 0;
 
-function calcMiddleYofPost(post)
-{
+function calcMiddleYofPost(post) {
     try {
         pos = post.getBoundingClientRect();
         center = (pos.bottom - pos.top) / 2 + pos.top;
@@ -12,20 +12,18 @@ function calcMiddleYofPost(post)
     }
 }
 
-function findCurrentCenteredPost(posts)
-{
+function findCurrentCenteredPost(posts) {
     coordsPostsCentered = posts.map(calcMiddleYofPost);
 
     let postsCentered = [];
     posts.forEach((element, index) => {
-        postsCentered[index] = {post: element, yCenter: coordsPostsCentered[index] + window.scrollY};
+        postsCentered[index] = { post: element, yCenter: coordsPostsCentered[index] + window.scrollY };
     });
     postsInView = postsCentered.filter((element) => {
         return (element.yCenter > window.scrollY) && (element.yCenter < (window.innerHeight + window.scrollY));
     });
 
-    if(postsInView.length == 0)
-    {
+    if (postsInView.length == 0) {
         return 2;
     }
 
@@ -35,11 +33,9 @@ function findCurrentCenteredPost(posts)
 
     currentContenderDiff = Math.abs(window.innerHeight / 2 + scrollY - postsInView[0].yCenter);
 
-    for (let i = 0; i < postsInView.length; i++)
-    {
+    for (let i = 0; i < postsInView.length; i++) {
         currentCandidateDiff = Math.abs(window.innerHeight / 2 + scrollY - postsInView[i].yCenter);
-        if(currentCandidateDiff < currentContenderDiff)
-        {
+        if (currentCandidateDiff < currentContenderDiff) {
             currentContenderDiff = currentCandidateDiff;
             currentContender = i;
         }
@@ -47,18 +43,20 @@ function findCurrentCenteredPost(posts)
     return postsInView;
 }
 
-function scrollToNextPostInView(postsInView)
-{
-    if(postsInView.length != (currentContender + 1))
-    {
-        window.scroll(0, postsInView[currentContender + 1].yCenter - window.innerHeight / 2);
+function scrollToNextPostInView(postsInView) {
+    if (postsInView.length != (currentContender + 1)) {
+        window.scrollTo({
+            top: postsInView[currentContender + 1].yCenter - window.innerHeight / 2,
+            behavior: enableSmoothScrolling ? "smooth" : "instant"
+        });
 
-    }else{
-        for (let i = 0; i < posts.length; i++)
-        {
-            if(posts[i].ariaLabel == postsInView[currentContender].post.ariaLabel)
-            {
-                window.scroll(0, window.scrollY + calcMiddleYofPost(posts[i + 1]) - window.innerHeight / 2);
+    } else {
+        for (let i = 0; i < posts.length; i++) {
+            if (posts[i].ariaLabel == postsInView[currentContender].post.ariaLabel) {
+                window.scrollTo({
+                    top: window.scrollY + calcMiddleYofPost(posts[i + 1]) - window.innerHeight / 2,
+                    behavior: enableSmoothScrolling ? "smooth" : "instant"
+                });
                 break;
             }
         }
@@ -76,7 +74,7 @@ document.onreadystatechange = () => {
                 }
             });
         });
-        
+
         let observerConfig = {
             childList: true,
             subtree: true
@@ -84,15 +82,17 @@ document.onreadystatechange = () => {
 
         observer.observe(document.body, observerConfig);
 
-        document.addEventListener('keydown', function(event) {
-            if(event.key == " ") {
+        document.addEventListener('keydown', function (event) {
+            if (event.key == " ") {
+                chrome.storage.sync.get("toggleState", (result) => {
+                    enableSmoothScrolling = result.toggleState;
+                });
                 let postsInView = findCurrentCenteredPost(posts);
-                if(postsInView != 2)
-                {
+                if (postsInView != 2) {
                     event.preventDefault();
                     scrollToNextPostInView(postsInView);
-                }    
-           }
+                }
+            }
         });
-    }   
+    }
 }
