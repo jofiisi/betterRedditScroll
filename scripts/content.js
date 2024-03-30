@@ -102,22 +102,34 @@ document.onreadystatechange = () => {
 
         observer.observe(document.body, observerConfig);
 
+
+        let isEnabled;
+
         document.addEventListener('keydown', function (event) {
             if (event.key == " ") {
-                chrome.storage.sync.get("toggleState", (result) => {
-                    enableSmoothScrolling = result.toggleState;
+                chrome.storage.sync.get({"enableState": true}, (result) => {
+                    console.log(result)
+                    console.log(result.enableState)
+                    isEnabled = result.enableState;
                 });
-                if (event.shiftKey) {
-                    let postsInView = findCurrentCenteredPost(posts);
-                    if (postsInView != 2) { // 2 is a error code
-                        event.preventDefault();
-                        scrollToPreviousPostInView(postsInView);
-                    }
-                } else {
-                    let postsInView = findCurrentCenteredPost(posts);
-                    if (postsInView != 2) {
-                        event.preventDefault();
-                        scrollToNextPostInView(postsInView);
+
+                console.log(isEnabled)
+                if (isEnabled) {
+                    chrome.storage.sync.get("toggleState", (result) => {
+                        enableSmoothScrolling = result.toggleState;
+                    });
+                    if (event.shiftKey) {
+                        let postsInView = findCurrentCenteredPost(posts);
+                        if (postsInView != 2) { // 2 is a error code
+                            event.preventDefault();
+                            scrollToPreviousPostInView(postsInView);
+                        }
+                    } else {
+                        let postsInView = findCurrentCenteredPost(posts);
+                        if (postsInView != 2) {
+                            event.preventDefault();
+                            scrollToNextPostInView(postsInView);
+                        }
                     }
                 }
             }
