@@ -63,6 +63,26 @@ function scrollToNextPostInView(postsInView) {
     }
 }
 
+function scrollToPreviousPostInView(postsInView) {
+    if (postsInView[currentContender - 1]) {
+        window.scrollTo({
+            top: postsInView[currentContender - 1].yCenter - window.innerHeight / 2,
+            behavior: enableSmoothScrolling ? "smooth" : "instant"
+        });
+
+    } else {
+        for (let i = 0; i < posts.length; i++) {
+            if (posts[i].ariaLabel == postsInView[currentContender].post.ariaLabel) {
+                window.scrollTo({
+                    top: window.scrollY + calcMiddleYofPost(posts[i - 1]) - window.innerHeight / 2,
+                    behavior: enableSmoothScrolling ? "smooth" : "instant"
+                });
+                break;
+            }
+        }
+    }
+}
+
 document.onreadystatechange = () => {
     if (document.readyState === "complete") {
         let observer = new MutationObserver((mutations) => {
@@ -87,10 +107,18 @@ document.onreadystatechange = () => {
                 chrome.storage.sync.get("toggleState", (result) => {
                     enableSmoothScrolling = result.toggleState;
                 });
-                let postsInView = findCurrentCenteredPost(posts);
-                if (postsInView != 2) {
-                    event.preventDefault();
-                    scrollToNextPostInView(postsInView);
+                if (event.shiftKey) {
+                    let postsInView = findCurrentCenteredPost(posts);
+                    if (postsInView != 2) { // 2 is a error code
+                        event.preventDefault();
+                        scrollToPreviousPostInView(postsInView);
+                    }
+                } else {
+                    let postsInView = findCurrentCenteredPost(posts);
+                    if (postsInView != 2) {
+                        event.preventDefault();
+                        scrollToNextPostInView(postsInView);
+                    }
                 }
             }
         });
