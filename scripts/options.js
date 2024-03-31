@@ -14,18 +14,27 @@ chrome.storage.sync.get('enableState', function(data) {
     }
 });
 
-toggleSwitch.addEventListener('change', function () {
+function notifyContentScript() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: "updatedOptions"});
+    });
+}
+
+
+toggleSwitch.addEventListener('change', async function () {
     isChecked = toggleSwitch.checked;
-    chrome.storage.sync.set({ 'toggleState': isChecked }, function () {
+    await chrome.storage.sync.set({ 'toggleState': isChecked }, function () {
         console.log('Toggle state saved:', isChecked);
     });
+    notifyContentScript();
 });
 
-enableSwtich.addEventListener('change', function () {
+enableSwtich.addEventListener('change', async function () {
     isEnabled = enableSwtich.checked;
-    chrome.storage.sync.set({ 'enableState': isEnabled }, function () {
+    await chrome.storage.sync.set({ 'enableState': isEnabled }, function () {
         console.log('enable state saved:', isEnabled);
     });
+    notifyContentScript();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -37,3 +46,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+notifyContentScript();

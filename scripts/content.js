@@ -1,6 +1,5 @@
 let posts;
 let currentContender = 0;
-let enableSmoothScrolling = 0;
 
 function calcMiddleYofPost(post) {
     try {
@@ -83,6 +82,26 @@ function scrollToPreviousPostInView(postsInView) {
     }
 }
 
+let isEnabled;
+let enableSmoothScrolling;
+
+function loadOptions() {
+    chrome.storage.sync.get({"enableState": true}, (result) => {
+        isEnabled = result.enableState;
+    });
+    chrome.storage.sync.get("toggleState", (result) => {
+        enableSmoothScrolling = result.toggleState;
+    });
+}
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    if (message.action === "updatedOptions") {
+        loadOptions(); 
+    }
+});
+
+
+
 document.onreadystatechange = () => {
     if (document.readyState === "complete") {
         let observer = new MutationObserver((mutations) => {
@@ -103,21 +122,10 @@ document.onreadystatechange = () => {
         observer.observe(document.body, observerConfig);
 
 
-        let isEnabled;
-
         document.addEventListener('keydown', function (event) {
             if (event.key == " ") {
-                chrome.storage.sync.get({"enableState": true}, (result) => {
-                    console.log(result)
-                    console.log(result.enableState)
-                    isEnabled = result.enableState;
-                });
-
-                console.log(isEnabled)
                 if (isEnabled) {
-                    chrome.storage.sync.get("toggleState", (result) => {
-                        enableSmoothScrolling = result.toggleState;
-                    });
+                    
                     if (event.shiftKey) {
                         let postsInView = findCurrentCenteredPost(posts);
                         if (postsInView != 2) { // 2 is a error code
@@ -136,3 +144,4 @@ document.onreadystatechange = () => {
         });
     }
 }
+
